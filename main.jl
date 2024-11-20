@@ -62,12 +62,11 @@ abs.(data.Bz2 + xt3) .> tau3
 
 # task 3
 # Kotelnikov series
-Bx1 = data.Bx1
 
 function kotelnikov_reconstruction_freq(x, n, t_span)
     function f(t)
         res = 0
-        for n in 1:32
+        for n in 1:n
             res += x[2*n]*(-1)^(2*n)*sin(pi*t/12)/(t-12*n)/pi
         end
         res
@@ -133,8 +132,8 @@ for i in 4:length(data_names)
         t, 
         kotelnikov_reconstruction_freq(
             data[:, i], 32, t), 
-            label="$(data_names[i])_32_ch",
-            color=:blue, 
+            label="$(data_names[i])_32_freq",
+            color=:green, 
             lw=2
     )   
     xlabel!("t, sec")
