@@ -38,27 +38,50 @@ Bx1, By2 - Co-directional
 Bz1, Bz2 - Opposite directional
 =#
 
-#=
-task 2
+
+# task 2
 
 
 xt1 = (data.Bx1+data.By2)/2
 xt2 = (data.By1+data.Bx2)/2
 xt3 = (data.Bz1-data.Bz2)/2
 
-tau1 = 2 * (abs.(0.05*max(data.Bx1, data.By2)) .+ 3)
-tau2 = 2 * (abs.(0.05*max(data.By1, data.Bx2)) .+ 3)
-tau3 = 2 * (abs.(0.05*max(data.Bz1, data.Bz2)) .+ 3)
+tau1 = 2 * (0.05*max(abs.(data.Bx1), abs.(data.By2)) .+ 3)
+tau2 = 2 * (0.05*max(abs.(data.By1), abs.(data.Bx2)) .+ 3)
+tau3 = 2 * (0.05*max(abs.(data.Bz1), abs.(data.Bz2)) .+ 3)
 
-abs.(data.Bx1 - xt1) .> tau1
-abs.(data.By2 - xt1) .> tau1
+indicator11 = abs.(data.Bx1 - xt1) .> tau1
+indicator12 = abs.(data.By2 - xt1) .> tau1
 
-abs.(data.By1 - xt2) .> tau2
-abs.(data.Bx2 - xt2) .> tau2
+indicator21 = abs.(data.By1 - xt2) .> tau2
+indicator22 = abs.(data.Bx2 - xt2) .> tau2
 
-abs.(data.Bz1 - xt3) .> tau3
-abs.(data.Bz2 + xt3) .> tau3
-=#
+indicator31 = abs.(data.Bz1 - xt3) .> tau3
+indicator32 = abs.(data.Bz2 + xt3) .> tau3
+
+println("Задание 2:")
+println(
+    "Bx1, By2: $(filter(x -> x > 0, indicator11) |> count) выбросов"
+)
+println(
+    "By1, Bx2: $(filter(x -> x > 0, indicator21) |> count) выбросов"
+)
+println(
+    "Bz1, Bz2: $(filter(x -> x > 0, indicator31) |> count) выбросов"
+)
+println("-----")
+
+# example for creatiing DataFrame and write it to csv
+# df = DataFrame(
+#         Bx1 = data.Bx1, 
+#         By2 = data.By2, 
+#         xt1 = xt1,
+#         tau1=tau1,
+#         dBx1=abs.(data.Bx1 - xt1),
+#         dBy2=abs.(data.By2 - xt1),
+#         checkDiff=abs.(data.Bx1 - xt1) .> tau1
+#     )
+# CSV.write("output.csv", df)
 
 # task 3
 # Kotelnikov series
@@ -86,57 +109,57 @@ function kotelnikov_reconstruction(x, n, t_span)
 end
 
 # Run Kotelnikov-series calculating and plot data
-t = [0.0 : 0.1 : 150...]
-if !isdir("results")
-    mkdir("results")
-    cd("results")
-end
+# t = [0.0 : 0.1 : 150...]
+# if !isdir("results")
+#     mkdir("results")
+#     cd("results")
+# end
 
-for i in 4:length(data_names)
-    plot(
-        t, 
-        kotelnikov_reconstruction(
-            data[:, i], 32, t), 
-            label="$(data_names[i])_32",
-            color=:blue, 
-            lw=2
-    )
-    plot!(
-        t, 
-        kotelnikov_reconstruction(
-            data[:, i], 64, t), 
-            label="$(data_names[i])_64",
-            color=:red, 
-            lw=2
-    )
-    plot!(
-        t, 
-        kotelnikov_reconstruction(
-            data[:, i], 128, t), 
-            label="$(data_names[i])_128",
-            color=:green, 
-            lw=2
-    )
-    xlabel!("t, sec")
-    savefig("$(data_names[i])_$(data_names[i])_distance.png")
+# for i in 4:length(data_names)
+#     plot(
+#         t, 
+#         kotelnikov_reconstruction(
+#             data[:, i], 32, t), 
+#             label="$(data_names[i])_32",
+#             color=:blue, 
+#             lw=2
+#     )
+#     plot!(
+#         t, 
+#         kotelnikov_reconstruction(
+#             data[:, i], 64, t), 
+#             label="$(data_names[i])_64",
+#             color=:red, 
+#             lw=2
+#     )
+#     plot!(
+#         t, 
+#         kotelnikov_reconstruction(
+#             data[:, i], 128, t), 
+#             label="$(data_names[i])_128",
+#             color=:green, 
+#             lw=2
+#     )
+#     xlabel!("t, sec")
+#     savefig("$(data_names[i])_$(data_names[i])_distance.png")
 
-    plot(
-        t, 
-        kotelnikov_reconstruction(
-            data[:, i], 32, t), 
-            label="$(data_names[i])_32",
-            color=:blue, 
-            lw=2
-    )
-    plot!(
-        t, 
-        kotelnikov_reconstruction_freq(
-            data[:, i], 32, t), 
-            label="$(data_names[i])_32_freq",
-            color=:green, 
-            lw=2
-    )   
-    xlabel!("t, sec")
-    savefig("$(data_names[i])_$(data_names[i])_freq_32.png") 
-end
-cd("..")
+#     plot(
+#         t, 
+#         kotelnikov_reconstruction(
+#             data[:, i], 32, t), 
+#             label="$(data_names[i])_32",
+#             color=:blue, 
+#             lw=2
+#     )
+#     plot!(
+#         t, 
+#         kotelnikov_reconstruction_freq(
+#             data[:, i], 32, t), 
+#             label="$(data_names[i])_32_freq",
+#             color=:green, 
+#             lw=2
+#     )   
+#     xlabel!("t, sec")
+#     savefig("$(data_names[i])_$(data_names[i])_freq_32.png") 
+# end
+# cd("..")
